@@ -159,4 +159,7 @@
       <Name>Urho3d.Rube</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\Data\" />
+  </ItemGroup>
 </Project>

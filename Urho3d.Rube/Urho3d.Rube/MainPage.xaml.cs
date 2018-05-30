@@ -28,9 +28,9 @@ namespace Urho3d.Rube
             string assetsFolder;
             switch (Device.RuntimePlatform)
             {
+                case Device.Android:
+                case Device.iOS:
                 case Device.UWP:
-                    assetsFolder = "Assets/Data";
-                    break;
                 default:
                     assetsFolder = "Data";
                     break;
