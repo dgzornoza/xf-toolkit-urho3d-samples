@@ -160,6 +160,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Resources\Data\" />
+    <Folder Include="Resources\Data\Urho2D\RubePhysics\" />
   </ItemGroup>
 </Project>

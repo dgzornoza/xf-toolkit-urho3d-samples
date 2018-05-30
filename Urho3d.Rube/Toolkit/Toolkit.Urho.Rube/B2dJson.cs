@@ -11,7 +11,7 @@ namespace Toolkit.Urho.Rube
 
     internal static class Helpers
     {
-        public static IEnumerable<T> GetRecursiveComponents<T>(this Urho.Node node)
+        public static IEnumerable<T> GetRecursiveComponents<T>(this Node node)
         {
             List<T> components = node.Components.OfType<T>().ToList();
 
@@ -719,7 +719,7 @@ namespace Toolkit.Urho.Rube
         /// <remarks>
         /// All components of the physical world will be created under a root node called 'b2djson', since RUBE is agnostic to the system of components of urho.
         /// </remarks>
-        public bool ReadIntoSceneFromFile(string filename, Scene ushoScene, out string errorMsg)
+        public bool ReadIntoSceneFromFile(string filename, Scene urhoScene, out string errorMsg)
         {
             errorMsg = null;
             bool hasError;
@@ -730,7 +730,7 @@ namespace Toolkit.Urho.Rube
 
                 string str = System.IO.File.ReadAllText(filename);
                 JObject worldValue = JObject.Parse(str);
-                J2b2World(worldValue, ushoScene);
+                J2b2World(worldValue, urhoScene);
                 hasError = false;
             }
             catch (IOException ex)
@@ -934,6 +934,7 @@ namespace Toolkit.Urho.Rube
                 CollisionChain2D chainFixture = body.Node.CreateComponent<CollisionChain2D>(mode: m_creationMode);
                 JObject chainValue = (JObject)fixtureValue["loop"];
                 int numVertices = ((JArray)chainValue["x"]).Count;
+                chainFixture.VertexCount = (uint)numVertices;
                 for (int i = 0; i < numVertices; i++) chainFixture.SetVertex((uint)i, JsonToVec("vertices", chainValue, i));
                 chainFixture.Loop = true;
                 fixture = chainFixture;
@@ -980,6 +981,7 @@ namespace Toolkit.Urho.Rube
                 else
                 {
                     CollisionPolygon2D poligonFixture = body.Node.CreateComponent<CollisionPolygon2D>(mode: m_creationMode);
+                    poligonFixture.VertexCount = (uint)numVertices;
                     for (int i = 0; i < numVertices; i++) poligonFixture.SetVertex((uint)i, JsonToVec("vertices", polygonValue, i));
                     fixture = poligonFixture;
                 }
@@ -1708,18 +1710,20 @@ namespace Toolkit.Urho.Rube
 
             if (index > -1)
             {
+                JToken jTokenX = (value[name]["x"][index] as JToken);
+                JToken jTokenY = (value[name]["y"][index] as JToken);
 
-                if (value[name]["x"][index].GetType() == typeof(int)) vec.X = (int)value[name]["x"][index]; //usually 0 or 1
-                else if (value[name]["x"][index].GetType() == typeof(string)) vec.X = HexToFloat((string)value[name]["x"][index]);
-                else vec.X = (float)value[name]["x"][index];
+                if (jTokenX.Type == JTokenType.Integer) vec.X = (int)jTokenX; //usually 0 or 1
+                else if (jTokenX.Type == JTokenType.String) vec.X = HexToFloat((string)jTokenX);
+                else vec.X = (float)jTokenX;
 
-                if (value[name]["y"][index].GetType() == typeof(int)) vec.Y = (int)value[name]["y"][index]; //usually 0 or 1
-                else if (value[name]["y"][index].GetType() == typeof(string)) vec.Y = HexToFloat((string)value[name]["y"][index]);
-                else vec.Y = (float)value[name]["y"][index];
+                if (jTokenY.Type == JTokenType.Integer) vec.Y = (int)jTokenY; //usually 0 or 1
+                else if (jTokenY.Type == JTokenType.String) vec.Y = HexToFloat((string)jTokenY);
+                else vec.Y = (float)jTokenY;
             }
             else
             {
-                if (value[name].GetType() == typeof(int)) vec = Vector2.Zero; // zero vector
+                if ((value[name] as JToken).Type == JTokenType.Integer) vec = Vector2.Zero; // zero vector
                 else
                 {
                     vec.X = JsonToFloat("x", (JObject)value[name]);

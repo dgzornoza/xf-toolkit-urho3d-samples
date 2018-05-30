@@ -156,7 +156,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Data\" />
+    <Content Include="..\..\Assets\Data\Urho2D\RubePhysics\documentA.json">
+      <Link>Data\Urho2D\RubePhysics\documentA.json</Link>
+    </Content>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
