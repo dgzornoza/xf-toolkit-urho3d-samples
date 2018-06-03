@@ -103,6 +103,12 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\Assets\Data\Urho2D\Sprites\Ball.png">
+      <Link>Data\Urho2D\Sprites\Ball.png</Link>
+    </Content>
+    <Content Include="..\..\Assets\Data\Urho2D\Sprites\Box.png">
+      <Link>Data\Urho2D\Sprites\Box.png</Link>
+    </Content>
     <Content Include="Assets\LargeTile.scale-100.png" />
     <Content Include="Assets\LargeTile.scale-200.png" />
     <Content Include="Assets\LargeTile.scale-400.png" />

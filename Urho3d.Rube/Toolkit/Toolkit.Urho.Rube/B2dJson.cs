@@ -944,8 +944,8 @@ namespace Toolkit.Urho.Rube
                 CollisionChain2D chainFixture = body.Node.CreateComponent<CollisionChain2D>(mode: m_creationMode);
                 JObject chainValue = (JObject)fixtureValue["chain"];
                 int numVertices = ((JArray)chainValue["vertices"]["x"]).Count;
-                List<Vector2> vertices = new List<Vector2>(numVertices);
-                for (int i = 0; i < numVertices; i++) vertices.Add(JsonToVec("vertices", chainValue, i));
+                chainFixture.VertexCount = (uint)numVertices;                
+                for (int i = 0; i < numVertices; i++) chainFixture.SetVertex((uint)i, JsonToVec("vertices", chainValue, i));
 
                 // Urho2d not has next/previous vertex, only has loop.
                 // this code is created reading 'b2ChainShape.cpp' from box2d
