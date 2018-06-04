@@ -38,23 +38,26 @@ namespace Urho3d.Rube.Samples
 
             if (Platform == Platforms.Android || Platform == Platforms.iOS || Platform == Platforms.UWP || Options.TouchEmulation)
             {
-                // InitTouchInput();
                 TouchEnabled = true;
             }
 
-            Input.Enabled = true;
-            Input.SetMouseVisible(true, false);
+            Input.Enabled = true;            
 
 #if DEBUG
             MonoDebugHud = new MonoDebugHud(this);
             MonoDebugHud.Show();
 #endif            
 
-            _createScene();
-            _setupViewport();
+            this._createScene();
+            this._createCamera();
+            this._setupViewport();
 
 
             SubscribeToEvents();
+
+
+            Rube rube = new Rube();
+            rube.LoadWorld(this._scene);
         }
 
 
@@ -74,10 +77,6 @@ namespace Urho3d.Rube.Samples
             this._scene = new Scene();
             this._scene.CreateComponent<Octree>();
             this._scene.CreateComponent<DebugRenderer>();
-            this._createCamera();
-
-            Rube rube = new Rube();
-            rube.LoadWorld(this._scene);
         }
 
 
@@ -121,6 +120,7 @@ namespace Urho3d.Rube.Samples
 
 
         Node pickedNode;
+        bool drawDebug = true;
 
         void SubscribeToEvents()
         {
@@ -129,8 +129,12 @@ namespace Urho3d.Rube.Samples
                 // If draw debug mode is enabled, draw viewport debug geometry, which will show eg. drawable bounding boxes and skeleton
                 // bones. Note that debug geometry has to be separately requested each frame. Disable depth test so that we can see the
                 // bones properly
-                // if (drawDebug) scene.GetComponent<PhysicsWorld2D>().DrawDebugGeometry();
-                this._scene.GetComponent<PhysicsWorld2D>().DrawDebugGeometry();
+                if (drawDebug)
+                {
+                    this._scene.GetComponent<PhysicsWorld2D>().DrawDebugGeometry();
+                    Renderer.DrawDebugGeometry(false);
+                }
+
             };
 
             if (TouchEnabled)
