@@ -14,15 +14,12 @@ namespace Urho3d.Rube.Samples
         private Camera _camera;
 
         protected bool TouchEnabled { get; set; }
-        RigidBody2D dummyBody;
+        private RigidBody2D _dummyBody;
 
 
         [Preserve]
         public UrhoApp(ApplicationOptions options = null) : base(options)
         {
-            touchBeginEventToken = new Action<TouchBeginEventArgs>(HandleTouchBegin3);
-            touchEndEventToken = new Action<TouchEndEventArgs>(HandleTouchEnd3);
-            touchMoveEventToken = new Action<TouchMoveEventArgs>(HandleTouchMove3);
         }
 
         static UrhoApp()
@@ -31,7 +28,7 @@ namespace Urho3d.Rube.Samples
             {
                 if (Debugger.IsAttached) Debugger.Break();
                 e.Handled = true;
-            };                       
+            };
         }
 
         protected override void Start()
@@ -46,17 +43,17 @@ namespace Urho3d.Rube.Samples
             }
 
             Input.Enabled = true;
-            Input.SetMouseVisible(true, false);            
+            Input.SetMouseVisible(true, false);
 
-#if DEBUG            
+#if DEBUG
             MonoDebugHud = new MonoDebugHud(this);
             MonoDebugHud.Show();
 #endif            
 
-            _createScene();            
+            _createScene();
             _setupViewport();
 
-            
+
             SubscribeToEvents();
         }
 
@@ -66,10 +63,6 @@ namespace Urho3d.Rube.Samples
 
         protected override void OnUpdate(float timeStep)
         {
-            if (Input.GetMouseButtonDown(MouseButton.Left))
-            {
-                var a = 5;
-            }
         }
 
 
@@ -92,10 +85,10 @@ namespace Urho3d.Rube.Samples
         {
             // Create camera
             Node CameraNode = _scene.CreateChild("MainCamera");
-            CameraNode.Position = (new Vector3(0.0f, 0.0f, -0.10f)); 
+            CameraNode.Position = (new Vector3(0.0f, 0.0f, -0.10f));
             this._camera = CameraNode.CreateComponent<Camera>();
             this._camera.Orthographic = true;
-            
+
             var graphics = Graphics;
             // x = Screen Width (px)
             // y = Screen Height(px)
@@ -125,10 +118,9 @@ namespace Urho3d.Rube.Samples
 
 
 
+
+
         Node pickedNode;
-        Action<TouchBeginEventArgs> touchBeginEventToken;        
-        Action<TouchEndEventArgs> touchEndEventToken;
-        Action<TouchMoveEventArgs> touchMoveEventToken;
 
         void SubscribeToEvents()
         {
@@ -141,33 +133,30 @@ namespace Urho3d.Rube.Samples
                 this._scene.GetComponent<PhysicsWorld2D>().DrawDebugGeometry();
             };
 
-            // Input.MouseButtonDown += this.mouseDownEventToken;
-
-            // Input.MouseButtonDown += Input_MouseButtonDown;
-            // this.mouseDownEventToken2 = Input.SubscribeToMouseButtonDown(HandleMouseButtonDown2);
-
             if (TouchEnabled)
             {
-                 Input.TouchBegin += touchBeginEventToken;
+                Input.TouchBegin += HandleTouchBegin3;
+
+                // dumybody
+                Node dummyNode = this._scene.CreateChild("DummyNode");
+                this._dummyBody = dummyNode.CreateComponent<RigidBody2D>();
+                this._scene.GetComponent<PhysicsWorld2D>().DrawJoint = true;
             }
         }
 
-        private void Input_TouchBegin(TouchBeginEventArgs obj)
-        {
-            throw new NotImplementedException();
-        }
+
 
         void HandleTouchBegin3(TouchBeginEventArgs args)
         {
             var graphics = Graphics;
             PhysicsWorld2D physicsWorld = this._scene.GetComponent<PhysicsWorld2D>();
-            RigidBody2D rigidBody = physicsWorld.GetRigidBody(new Vector2(args.X, args.Y), uint.MaxValue); // Raycast for RigidBody2Ds to pick
+            RigidBody2D rigidBody = physicsWorld.GetRigidBody(args.X, args.Y, uint.MaxValue); // Raycast for RigidBody2Ds to pick
             if (rigidBody != null)
             {
                 pickedNode = rigidBody.Node;
-                StaticSprite2D staticSprite = pickedNode.GetComponent<StaticSprite2D>();
-                staticSprite.Color = (new Color(1.0f, 0.0f, 0.0f, 1.0f)); // Temporary modify color of the picked sprite
-                rigidBody = pickedNode.GetComponent<RigidBody2D>();
+                // StaticSprite2D staticSprite = pickedNode.GetComponent<StaticSprite2D>();
+                // staticSprite.Color = (new Color(1.0f, 0.0f, 0.0f, 1.0f)); // Temporary modify color of the picked sprite
+                // rigidBody = pickedNode.GetComponent<RigidBody2D>();
 
                 // Create a ConstraintMouse2D - Temporary apply this constraint to the pickedNode to allow grasping and moving with touch
                 ConstraintMouse2D constraintMouse = pickedNode.CreateComponent<ConstraintMouse2D>();
@@ -175,27 +164,27 @@ namespace Urho3d.Rube.Samples
                 constraintMouse.Target = new Vector2(pos.X, pos.Y);
                 constraintMouse.MaxForce = 1000 * rigidBody.Mass;
                 constraintMouse.CollideConnected = true;
-                constraintMouse.OtherBody = dummyBody;  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
+                constraintMouse.OtherBody = _dummyBody;  // Use dummy body instead of rigidBody. It's better to create a dummy body automatically in ConstraintMouse2D
                 constraintMouse.DampingRatio = 0;
             }
 
-            Input.TouchMove += touchMoveEventToken;
-            Input.TouchEnd += touchEndEventToken;
+            Input.TouchMove += HandleTouchMove3;
+            Input.TouchEnd += HandleTouchEnd3;
         }
 
         void HandleTouchEnd3(TouchEndEventArgs args)
         {
             if (pickedNode != null)
             {
-                StaticSprite2D staticSprite = pickedNode.GetComponent<StaticSprite2D>();
-                staticSprite.Color = (new Color(1.0f, 1.0f, 1.0f, 1.0f)); // Restore picked sprite color
+                // StaticSprite2D staticSprite = pickedNode.GetComponent<StaticSprite2D>();
+                // staticSprite.Color = (new Color(1.0f, 1.0f, 1.0f, 1.0f)); // Restore picked sprite color
                 pickedNode.RemoveComponent<ConstraintMouse2D>(); // Remove temporary constraint
                 pickedNode = null;
             }
-            
 
-            Input.TouchMove -= touchMoveEventToken;
-            Input.TouchEnd -= touchEndEventToken;            
+
+            Input.TouchMove -= HandleTouchMove3;
+            Input.TouchEnd -= HandleTouchEnd3;
         }
 
         void HandleTouchMove3(TouchMoveEventArgs args)
