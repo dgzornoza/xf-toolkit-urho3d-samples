@@ -10,11 +10,11 @@ namespace Urho3d.Rube.Samples
     {
         public Rube() { }
 
-        public void LoadWorld(Scene scene)
+        public void LoadWorld(Node node)
         {
             string filePath = Urho.Application.Current.ResourceCache.GetResourceFileName("Urho2D/RubePhysics/documentA.json");
             Toolkit.Urho.Rube.B2dJson b2dJson = new Toolkit.Urho.Rube.B2dJson();
-            b2dJson.ReadIntoSceneFromFile(filePath, scene, out string errorMsg);            
+            b2dJson.ReadIntoNodeFromFile(filePath, node, out string errorMsg);            
         }
     }
 }

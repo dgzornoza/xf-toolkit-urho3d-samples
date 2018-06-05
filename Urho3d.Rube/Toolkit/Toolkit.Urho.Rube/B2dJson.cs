@@ -62,7 +62,6 @@ namespace Toolkit.Urho.Rube
         /// <summary>From box2d</summary>
         private const int b2_maxPolygonVertices = 8;
 
-        private const string URHO2D_PHYSIC_ROOT_NODE_NAME = "B2dJsonPhysicWorldRoot";
         private readonly CreateMode m_creationMode;
 
         protected bool m_useHumanReadableFloats;
@@ -158,43 +157,41 @@ namespace Toolkit.Urho.Rube
         #region [writing functions]
 
         /// <summary>
-        /// Write urho2d scene (only box2d physic world data) into b2djson format for R.U.B.E editor
+        /// Write urho2d scene node (only box2d physic world data) into b2djson format for R.U.B.E editor
         /// </summary>
-        /// <param name="urhoScene">Urho2d scene</param>
-        /// <returns>json object with urho2d physic world in b2djson format</returns>
+        /// <param name="urhoNode">Urho2d scene node with physics data</param>
+        /// <returns>json object with urho2d node physic in b2djson format</returns>
         /// <remarks>
         /// b2djson do not maintain the tree structure of nodes with the physical components from urho2d, 
         /// so that if it is loaded, the structure of nodes will be different from the current one.
         /// </remarks>
-        public JObject WriteToValue(Scene urhoScene)
+        public JObject WriteToValue(Node urhoNode)
         {
-            PhysicsWorld2D world;
-            if (null == urhoScene || null == (world = urhoScene.GetComponent<PhysicsWorld2D>())) return new JObject();
+            if (null == urhoNode || null == urhoNode.Scene.GetComponent<PhysicsWorld2D>()) return new JObject();
 
-            return B2j(world);
+            return B2j(urhoNode);
         }
 
         /// <summary>
-        /// Write urho2d scene (only box2d physic world data) into b2djson format for R.U.B.E editor
+        /// Write urho2d scene node (only box2d physic world data) into b2djson format for R.U.B.E editor
         /// </summary>
-        /// <param name="urhoScene">Urho2d scene</param>
-        /// <returns>string with urho2d physic world in b2djson format</returns>
+        /// <param name="urhoNode">Urho2d scene node with physics data</param>
+        /// <returns>string with urho2d node physic in b2djson format</returns>
         /// <remarks>
         /// b2djson do not maintain the tree structure of nodes with the physical components from urho2d, 
         /// so that if it is loaded, the structure of nodes will be different from the current one.
         /// </remarks>
-        public string WriteToString(Scene urhoScene)
+        public string WriteToString(Node urhoNode)
         {
-            PhysicsWorld2D world;
-            if (null == urhoScene || null == (world = urhoScene.GetComponent<PhysicsWorld2D>())) return string.Empty;
+            if (null == urhoNode || null == urhoNode.Scene.GetComponent<PhysicsWorld2D>()) return string.Empty;
 
-            return B2j(world).ToString();
+            return B2j(urhoNode).ToString();
         }
 
         /// <summary>
-        /// Write urho2d scene (only box2d physic world data) into b2djson format for R.U.B.E editor
+        /// Write urho2d scene node (only box2d physic world data) into b2djson format for R.U.B.E editor
         /// </summary>
-        /// <param name="urhoScene">Urho2d scene</param>
+        /// <param name="urhoNode">Urho2d scene node with physics data</param>
         /// <param name="filename">path to filename to write</param>
         /// <param name="errorMsg">error message</param>
         /// <returns>true if write to file, false otherwise</returns>
@@ -202,17 +199,16 @@ namespace Toolkit.Urho.Rube
         /// b2djson do not maintain the tree structure of nodes with the physical components from urho2d, 
         /// so that if it is loaded, the structure of nodes will be different from the current one.
         /// </remarks>
-        public bool WriteToFile(Scene urhoScene, string filename, out string errorMsg)
+        public bool WriteToFile(Node urhoNode, string filename, out string errorMsg)
         {
-            errorMsg = string.Empty;
-            PhysicsWorld2D world;
-            if (null == urhoScene || string.IsNullOrWhiteSpace(filename) || null == (world = urhoScene.GetComponent<PhysicsWorld2D>())) return false;
+            errorMsg = string.Empty;            
+            if (null == urhoNode || string.IsNullOrWhiteSpace(filename) || null == urhoNode.Scene.GetComponent<PhysicsWorld2D>()) return false;
 
             using (TextWriter writeFile = new StreamWriter(filename))
             {
                 try
                 {
-                    writeFile.WriteLine(B2j(world).ToString());
+                    writeFile.WriteLine(B2j(urhoNode).ToString());
                 }
                 catch (Exception e)
                 {
@@ -225,8 +221,10 @@ namespace Toolkit.Urho.Rube
         }
 
 
-        public JObject B2j(PhysicsWorld2D world)
+        public JObject B2j(Node urhoNode)
         {
+            PhysicsWorld2D world = urhoNode.Scene.GetComponent<PhysicsWorld2D>();
+
             JObject worldValue = new JObject();
 
             m_bodyToIndexMap.Clear();
@@ -246,8 +244,8 @@ namespace Toolkit.Urho.Rube
             // Body
             int index = 0;
             JArray jArray = new JArray();
-            IEnumerable<RigidBody2D> worldBodyList = world.Scene.GetRecursiveComponents<RigidBody2D>();
-            foreach (var item in worldBodyList)
+            IEnumerable<RigidBody2D> nodeBodyList = urhoNode.GetRecursiveComponents<RigidBody2D>();
+            foreach (var item in nodeBodyList)
             {
                 m_bodyToIndexMap.Add(item, index);
                 jArray.Add(B2j(item));
@@ -259,15 +257,15 @@ namespace Toolkit.Urho.Rube
             // need two passes for joints because gear joints reference other joints
             index = 0;
             jArray = new JArray();
-            IEnumerable<Constraint2D> worldJointList = world.Scene.GetRecursiveComponents<Constraint2D>();
-            foreach (var joint in worldJointList)
+            IEnumerable<Constraint2D> nodeJointList = urhoNode.GetRecursiveComponents<Constraint2D>();
+            foreach (var joint in nodeJointList)
             {
                 if (joint.TypeName == ConstraintGear2D.TypeNameStatic) continue;
                 m_jointToIndexMap[joint] = index;
                 jArray.Add(B2j(joint));
                 index++;
             }
-            foreach (var joint in worldJointList)
+            foreach (var joint in nodeJointList)
             {
                 if (joint.TypeName != ConstraintGear2D.TypeNameStatic) continue;
                 m_jointToIndexMap[joint] = index;
@@ -665,31 +663,25 @@ namespace Toolkit.Urho.Rube
         #region [reading functions]
 
         /// <summary>
-        /// Read b2djson format from R.U.B.E editor into urho2d scene (only box2d physic world data)
+        /// Read b2djson format from R.U.B.E editor into urho2d node (only box2d physic world data)
         /// </summary>
         /// <param name="b2djsonWorld">physic world in b2djson format from R.U.B.E editor</param>
-        /// <param name="urhoScene">Urho2d scene where will be loaded</param>
-        /// <returns>true if exit, false otherwise</returns>
-        /// <remarks>
-        /// All components of the physical world will be created under a root node called from const 'URHO2D_PHYSIC_ROOT_NOE_NAME', since RUBE is agnostic to the system of components of urho.
-        /// </remarks>
-        public bool ReadIntoSceneFromValue(JObject b2djsonWorld, Scene urhoScene)
+        /// <param name="urhoNode">Urho2d node where will be loaded</param>
+        /// <returns>true if can read, false otherwise</returns>
+        public bool ReadIntoNodeFromValue(JObject b2djsonWorld, Node urhoNode)
         {
-            J2b2World(b2djsonWorld, urhoScene);
+            J2b2World(b2djsonWorld, urhoNode);
             return true;
         }
 
         /// <summary>
-        /// Read b2djson format from R.U.B.E editor into urho2d scene (only box2d physic world data)
+        /// Read b2djson format from R.U.B.E editor into urho2d node (only box2d physic world data)
         /// </summary>
         /// <param name="str">string with physic world in b2djson format from R.U.B.E editor</param>
-        /// <param name="urhoScene">Urho2d scene where will be loaded</param>
+        /// <param name="urhoNode">Urho2d node where will be loaded</param>
         /// <param name="errorMsg">error message</param>
-        /// <returns>true if exit, false otherwise</returns>
-        /// <remarks>
-        /// All components of the physical world will be created under a root node called 'b2djson', since RUBE is agnostic to the system of components of urho.
-        /// </remarks>
-        public bool ReadIntoSceneFromString(string str, Scene urhoScene, out string errorMsg)
+        /// <returns>true if can read, false otherwise</returns>
+        public bool ReadIntoNodeFromString(string str, Node urhoNode, out string errorMsg)
         {
             errorMsg = null;
             bool hasError;
@@ -697,7 +689,7 @@ namespace Toolkit.Urho.Rube
             try
             {
                 JObject worldValue = JObject.Parse(str);
-                J2b2World(worldValue, urhoScene);
+                J2b2World(worldValue, urhoNode);
                 hasError = false;
             }
             catch (IOException ex)
@@ -710,16 +702,13 @@ namespace Toolkit.Urho.Rube
         }
 
         /// <summary>
-        /// Read b2djson format from R.U.B.E editor into urho2d scene (only box2d physic world data)
+        ///  Read b2djson format from R.U.B.E editor into urho2d node (only box2d physic world data)
         /// </summary>
         /// <param name="filename">file with physic world in b2djson format from R.U.B.E editor</param>
-        /// <param name="urhoScene">Urho2d scene where will be loaded</param>
+        /// <param name="urhoNode">Urho2d node where will be loaded</param>
         /// <param name="errorMsg">error message</param>
-        /// <returns></returns>
-        /// <remarks>
-        /// All components of the physical world will be created under a root node called 'b2djson', since RUBE is agnostic to the system of components of urho.
-        /// </remarks>
-        public bool ReadIntoSceneFromFile(string filename, Scene urhoScene, out string errorMsg)
+        /// <returns>true if can read, false otherwise</returns>
+        public bool ReadIntoNodeFromFile(string filename, Node urhoNode, out string errorMsg)
         {
             errorMsg = null;
             bool hasError;
@@ -730,7 +719,7 @@ namespace Toolkit.Urho.Rube
 
                 string str = System.IO.File.ReadAllText(filename);
                 JObject worldValue = JObject.Parse(str);
-                J2b2World(worldValue, urhoScene);
+                J2b2World(worldValue, urhoNode);
                 hasError = false;
             }
             catch (IOException ex)
@@ -745,18 +734,19 @@ namespace Toolkit.Urho.Rube
 
 
         /// <summary>
-        /// Create physic world in urho2d scene from b2dson format
+        /// Create physic world in urho2d node from b2dson format
         /// </summary>
         /// <param name="worldValue">world value in b2djson format</param>
-        /// <param name="urhoScene">urho2d scene where will be loaded</param>
-        /// <returns>root node for all physic world</returns>
-        public Node J2b2World(JObject worldValue, Scene urhoScene)
+        /// <param name="urhoNode">urho2d node where will be loaded</param>
+        /// <returns>urhoNode for fluent api</returns>
+        public Node J2b2World(JObject worldValue, Node urhoNode)
         {
-            if (null == urhoScene) throw new ArgumentNullException("ushoScene");
+            if (null == urhoNode) throw new ArgumentNullException("urhoNode");
 
             m_bodies.Clear();
 
-            PhysicsWorld2D world = urhoScene.GetOrCreateComponent<PhysicsWorld2D>();
+            // ensure PhysicsWorld2D component in scene
+            PhysicsWorld2D world = urhoNode.Scene.GetOrCreateComponent<PhysicsWorld2D>();
             world.Gravity = JsonToVec("gravity", worldValue);
 
             world.AllowSleeping = (bool)worldValue["allowSleep"];
@@ -766,11 +756,6 @@ namespace Toolkit.Urho.Rube
             world.SubStepping = (bool)worldValue["subStepping"];
 
             ReadCustomPropertiesFromJson(world, worldValue);
-
-            // Create RootNode            
-            Node physicRootNode = urhoScene.Children.FirstOrDefault(item => item.Name == URHO2D_PHYSIC_ROOT_NODE_NAME);
-            if (null != physicRootNode) urhoScene.RemoveChild(physicRootNode);
-            physicRootNode = urhoScene.CreateChild(URHO2D_PHYSIC_ROOT_NODE_NAME);
 
 
             //bool recreationMayDiffer = false; //hahaha
@@ -792,7 +777,7 @@ namespace Toolkit.Urho.Rube
                 for (int i = 0; i < numBodyValues; i++)
                 {
                     JObject bodyValue = (JObject)bodyValues[i];
-                    RigidBody2D body = J2b2Body(physicRootNode.CreateChild(mode: m_creationMode), bodyValue);
+                    RigidBody2D body = J2b2Body(urhoNode.CreateChild(mode: m_creationMode), bodyValue);
                     ReadCustomPropertiesFromJson(body, bodyValue);
                     m_bodies.Add(body);
                     m_indexToBodyMap.Add(i, body);
@@ -839,7 +824,7 @@ namespace Toolkit.Urho.Rube
                 }
             }
 
-            return physicRootNode;
+            return urhoNode;
         }
 
 

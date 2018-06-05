@@ -54,7 +54,7 @@ namespace Urho3d.Rube.Samples
 
 
             Rube rube = new Rube();
-            rube.LoadWorld(this._scene);
+            rube.LoadWorld(this._scene.CreateChild("physicsNode"));
         }
 
 
