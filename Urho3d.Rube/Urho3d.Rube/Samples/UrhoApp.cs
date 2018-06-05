@@ -8,11 +8,15 @@ using Urho.Urho2D;
 namespace Urho3d.Rube.Samples
 {
     public class UrhoApp : Application
-    {        
+    {
+        private MonoDebugHud _monoDebugHud;
+
         private Scene _scene;
         private Camera _camera;
-        private bool _touchEnabled;
-        bool drawDebug = true;
+
+        private bool _drawDebug = true;
+
+
 
         [Preserve]
         public UrhoApp(ApplicationOptions options = null) : base(options)
@@ -28,41 +32,38 @@ namespace Urho3d.Rube.Samples
             };
         }
 
+
+
+
         protected override void Start()
         {
             Log.LogMessage += e => Debug.WriteLine($"[{e.Level}] {e.Message}");
-            base.Start();                      
+            base.Start();
 
 #if DEBUG
-            MonoDebugHud = new MonoDebugHud(this);
-            MonoDebugHud.Show();
-#endif            
+            _monoDebugHud = new MonoDebugHud(this);
+            _monoDebugHud.Show();
+#endif
 
             this._createScene();
             this._createCamera();
             this._setupViewport();
 
-
-            Input.Enabled = true;
+            
             this._subscribeToEvents();
 
-            if (Platform == Platforms.Android || Platform == Platforms.iOS || Platform == Platforms.UWP || Options.TouchEmulation)
-            {
-                _touchEnabled = true;
-            }
 
             Rube rube = new Rube();
             rube.LoadWorld(this._scene);
+
+            this._scene.RemoveComponent<Components.HandlePhysicsTouches>();
         }
 
-
-        protected MonoDebugHud MonoDebugHud { get; set; }
 
 
         protected override void OnUpdate(float timeStep)
         {
         }
-
 
 
 
@@ -72,6 +73,9 @@ namespace Urho3d.Rube.Samples
             this._scene = new Scene();
             this._scene.CreateComponent<Octree>();
             this._scene.CreateComponent<DebugRenderer>();
+
+            // add touches component for test physics
+            this._scene.CreateComponent<Components.HandlePhysicsTouches>();
         }
 
 
@@ -105,12 +109,13 @@ namespace Urho3d.Rube.Samples
 
             renderer.SetViewport(0, viewport);
 
+            // Set background color for the scene
             // Zone zone = renderer.DefaultZone;
-            // zone.FogColor = (new Color(1f, 0.1f, 0.1f)); // Set background color for the scene
+            // zone.FogColor = (new Color(1f, 0.1f, 0.1f));
         }
 
 
-        
+
 
         private void _subscribeToEvents()
         {
@@ -119,7 +124,7 @@ namespace Urho3d.Rube.Samples
                 // If draw debug mode is enabled, draw viewport debug geometry, which will show eg. drawable bounding boxes and skeleton
                 // bones. Note that debug geometry has to be separately requested each frame. Disable depth test so that we can see the
                 // bones properly
-                if (drawDebug)
+                if (_drawDebug)
                 {
                     this._scene.GetComponent<PhysicsWorld2D>().DrawDebugGeometry();
                     Renderer.DrawDebugGeometry(false);
