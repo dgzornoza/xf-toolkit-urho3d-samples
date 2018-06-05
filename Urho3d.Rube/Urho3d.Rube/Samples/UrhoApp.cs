@@ -52,9 +52,10 @@ namespace Urho3d.Rube.Samples
             
             this._subscribeToEvents();
 
-
-            Rube rube = new Rube();
-            rube.LoadWorld(this._scene.CreateChild("physicsNode"));
+            // TEMP: load rube
+            string filePath = ResourceCache.GetResourceFileName("Urho2D/RubePhysics/documentA.json");
+            Toolkit.Urho.Rube.B2dJson b2dJson = new Toolkit.Urho.Rube.B2dJson();
+            b2dJson.ReadIntoNodeFromFile(filePath, this._scene.CreateChild("physicsNode"), out string errorMsg);
         }
 
 
