@@ -55,8 +55,6 @@ namespace Urho3d.Rube.Samples
 
             Rube rube = new Rube();
             rube.LoadWorld(this._scene);
-
-            this._scene.RemoveComponent<Components.HandlePhysicsTouches>();
         }
 
 
@@ -66,7 +64,7 @@ namespace Urho3d.Rube.Samples
         }
 
 
-
+        
         private void _createScene()
         {            
             // create scene
