@@ -125,7 +125,7 @@ namespace Urho3d.Rube.Samples
                 // bones properly
                 if (_drawDebug)
                 {
-                    this._scene.GetComponent<PhysicsWorld2D>().DrawDebugGeometry();
+                    this._scene.GetComponent<PhysicsWorld2D>()?.DrawDebugGeometry();
                     Renderer.DrawDebugGeometry(false);
                 }
             };
