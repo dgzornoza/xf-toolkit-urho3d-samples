@@ -4,19 +4,20 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{E7080557-1C43-4C9B-983A-ABE1F558C553}</ProjectGuid>
+    <ProjectGuid>{0A78A457-987F-4FE9-96B8-B1B11C0ED6C3}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Urho3d.Rube.UWP</RootNamespace>
     <AssemblyName>Urho3d.Rube.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.16299.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.16299.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
-    <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
+    <EnableDotNetNativeCompatibleProfile>true</EnableDotNetNativeCompatibleProfile>
     <PackageCertificateKeyFile>Urho3d.Rube.UWP_TemporaryKey.pfx</PackageCertificateKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
@@ -109,34 +110,14 @@
     <Content Include="..\..\Assets\Data\Urho2D\Sprites\Box.png">
       <Link>Data\Urho2D\Sprites\Box.png</Link>
     </Content>
-    <Content Include="Assets\LargeTile.scale-100.png" />
-    <Content Include="Assets\LargeTile.scale-200.png" />
-    <Content Include="Assets\LargeTile.scale-400.png" />
-    <Content Include="Assets\SmallTile.scale-100.png" />
-    <Content Include="Assets\SmallTile.scale-200.png" />
-    <Content Include="Assets\SmallTile.scale-400.png" />
-    <Content Include="Assets\SplashScreen.scale-100.png" />
-    <Content Include="Assets\SplashScreen.scale-200.png" />
-    <Content Include="Assets\SplashScreen.scale-400.png" />
-    <Content Include="Assets\Square150x150Logo.scale-100.png" />
-    <Content Include="Assets\Square150x150Logo.scale-200.png" />
-    <Content Include="Assets\Square150x150Logo.scale-400.png" />
-    <Content Include="Assets\Square44x44Logo.altform-unplated_targetsize-16.png" />
-    <Content Include="Assets\Square44x44Logo.altform-unplated_targetsize-256.png" />
-    <Content Include="Assets\Square44x44Logo.altform-unplated_targetsize-48.png" />
-    <Content Include="Assets\Square44x44Logo.scale-100.png" />
-    <Content Include="Assets\Square44x44Logo.scale-200.png" />
-    <Content Include="Assets\Square44x44Logo.scale-400.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-16.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-256.png" />
-    <Content Include="Assets\Square44x44Logo.targetsize-48.png" />
-    <Content Include="Assets\StoreLogo.scale-100.png" />
-    <Content Include="Assets\StoreLogo.scale-200.png" />
-    <Content Include="Assets\StoreLogo.scale-400.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-100.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
-    <Content Include="Assets\Wide310x150Logo.scale-400.png" />
     <Content Include="Properties\Default.rd.xml" />
+    <Content Include="Assets\LockScreenLogo.scale-200.png" />
+    <Content Include="Assets\SplashScreen.scale-200.png" />
+    <Content Include="Assets\Square150x150Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Content Include="Assets\StoreLogo.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -149,15 +130,16 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.1.5" />
     <PackageReference Include="UrhoSharp.Forms">
       <Version>1.8.93</Version>
     </PackageReference>
-    <PackageReference Include="Xamarin.Forms" Version="3.0.0.482510" />
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.1.4" />
+    <PackageReference Include="Xamarin.Forms" Version="3.0.0.550146" />
+    <PackageReference Include="Prism.Unity.Forms" Version="7.0.0.396" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Urho3d.Rube\Urho3d.Rube.csproj">
-      <Project>{FF9CB53B-F639-4A97-AFA8-DE6E94A8F2D4}</Project>
+      <Project>{A682884C-CB44-4A89-B752-27BB634E0ABE}</Project>
       <Name>Urho3d.Rube</Name>
     </ProjectReference>
   </ItemGroup>
@@ -165,6 +147,7 @@
     <Content Include="..\..\Assets\Data\Urho2D\RubePhysics\documentA.json">
       <Link>Data\Urho2D\RubePhysics\documentA.json</Link>
     </Content>
+    <None Include="Urho3d.Rube.UWP_TemporaryKey.pfx" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

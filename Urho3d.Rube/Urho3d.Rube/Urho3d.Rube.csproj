@@ -6,11 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="UrhoSharp.Forms" Version="1.8.93" />
-    <PackageReference Include="Xamarin.Forms" Version="3.0.0.482510" />
+    <PackageReference Include="Xamarin.Forms" Version="3.0.0.550146" />
+    <PackageReference Include="Prism.Unity.Forms" Version="7.0.0.396" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Toolkit\Toolkit.Urho.Rube\Toolkit.Urho.Rube.csproj" />
+    <Reference Include="Toolkit.Urho.Rube">
+      <HintPath>..\Toolkit\Toolkit.Urho.Rube\bin\Debug\netstandard2.0\Toolkit.Urho.Rube.dll</HintPath>
+    </Reference>
   </ItemGroup>
+
 </Project>
