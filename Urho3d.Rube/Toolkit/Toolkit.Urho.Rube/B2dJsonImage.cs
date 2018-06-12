@@ -111,8 +111,7 @@ namespace Toolkit.Urho.Rube
         /// <summary>
         /// Does this aabb contain the provided AABB.
         /// </summary>
-        /// <param name=""></param>
-        /// <param name=""></param>
+        /// <param name="aabb">Axis aligned bounding box</param>
         /// <returns></returns>
         public bool Contains(AABB aabb)
         {
