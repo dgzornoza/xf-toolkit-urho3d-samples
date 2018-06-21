@@ -667,10 +667,11 @@ namespace Toolkit.Urho.Rube
         /// </summary>
         /// <param name="b2djsonWorld">physic world in b2djson format from R.U.B.E editor</param>
         /// <param name="urhoNode">Urho2d node where will be loaded</param>
+        /// <param name="includeWorld">Flag for include world (true include world, false otherwise)</param>
         /// <returns>true if can read, false otherwise</returns>
-        public bool ReadIntoNodeFromValue(JObject b2djsonWorld, Node urhoNode)
+        public bool ReadIntoNodeFromValue(JObject b2djsonWorld, Node urhoNode, bool includeWorld)
         {
-            J2b2World(b2djsonWorld, urhoNode);
+            J2b2World(b2djsonWorld, urhoNode, includeWorld);
             return true;
         }
 
@@ -679,9 +680,10 @@ namespace Toolkit.Urho.Rube
         /// </summary>
         /// <param name="str">string with physic world in b2djson format from R.U.B.E editor</param>
         /// <param name="urhoNode">Urho2d node where will be loaded</param>
+        /// <param name="includeWorld">Flag for include world (true include world, false otherwise)</param>
         /// <param name="errorMsg">error message</param>
         /// <returns>true if can read, false otherwise</returns>
-        public bool ReadIntoNodeFromString(string str, Node urhoNode, out string errorMsg)
+        public bool ReadIntoNodeFromString(string str, Node urhoNode, bool includeWorld, out string errorMsg)
         {
             errorMsg = null;
             bool hasError;
@@ -689,7 +691,7 @@ namespace Toolkit.Urho.Rube
             try
             {
                 JObject worldValue = JObject.Parse(str);
-                J2b2World(worldValue, urhoNode);
+                J2b2World(worldValue, urhoNode, includeWorld);
                 hasError = false;
             }
             catch (IOException ex)
@@ -706,9 +708,10 @@ namespace Toolkit.Urho.Rube
         /// </summary>
         /// <param name="filename">file with physic world in b2djson format from R.U.B.E editor</param>
         /// <param name="urhoNode">Urho2d node where will be loaded</param>
+        /// <param name="includeWorld">Flag for include world (true include world, false otherwise)</param>
         /// <param name="errorMsg">error message</param>
         /// <returns>true if can read, false otherwise</returns>
-        public bool ReadIntoNodeFromFile(string filename, Node urhoNode, out string errorMsg)
+        public bool ReadIntoNodeFromFile(string filename, Node urhoNode, bool includeWorld, out string errorMsg)
         {
             errorMsg = null;
             bool hasError;
@@ -719,7 +722,7 @@ namespace Toolkit.Urho.Rube
 
                 string str = System.IO.File.ReadAllText(filename);
                 JObject worldValue = JObject.Parse(str);
-                J2b2World(worldValue, urhoNode);
+                J2b2World(worldValue, urhoNode, includeWorld);
                 hasError = false;
             }
             catch (IOException ex)
@@ -738,25 +741,28 @@ namespace Toolkit.Urho.Rube
         /// </summary>
         /// <param name="worldValue">world value in b2djson format</param>
         /// <param name="urhoNode">urho2d node where will be loaded</param>
+        /// <param name="includeWorld">Flag for include world (true include world, false otherwise)</param>
         /// <returns>urhoNode for fluent api</returns>
-        public Node J2b2World(JObject worldValue, Node urhoNode)
+        public Node J2b2World(JObject worldValue, Node urhoNode, bool includeWorld)
         {
             if (null == urhoNode) throw new ArgumentNullException("urhoNode");
 
             m_bodies.Clear();
 
-            // ensure PhysicsWorld2D component in scene
-            PhysicsWorld2D world = urhoNode.Scene.GetOrCreateComponent<PhysicsWorld2D>();
-            world.Gravity = JsonToVec("gravity", worldValue);
+            if (includeWorld)
+            {
+                // ensure PhysicsWorld2D component in scene
+                PhysicsWorld2D world = urhoNode.Scene.GetOrCreateComponent<PhysicsWorld2D>();
+                world.Gravity = JsonToVec("gravity", worldValue);
 
-            world.AllowSleeping = (bool)worldValue["allowSleep"];
-            world.AutoClearForces = (bool)worldValue["autoClearForces"];
-            world.WarmStarting = (bool)worldValue["warmStarting"];
-            world.ContinuousPhysics = (bool)worldValue["continuousPhysics"];
-            world.SubStepping = (bool)worldValue["subStepping"];
+                world.AllowSleeping = (bool)worldValue["allowSleep"];
+                world.AutoClearForces = (bool)worldValue["autoClearForces"];
+                world.WarmStarting = (bool)worldValue["warmStarting"];
+                world.ContinuousPhysics = (bool)worldValue["continuousPhysics"];
+                world.SubStepping = (bool)worldValue["subStepping"];
 
-            ReadCustomPropertiesFromJson(world, worldValue);
-
+                ReadCustomPropertiesFromJson(world, worldValue);
+            }
 
             //bool recreationMayDiffer = false; //hahaha
             //if ( ! world->GetAutoClearForces() ) { std::cout << "Note: world is not set to auto clear forces.\n"; recreationMayDiffer = true; }
