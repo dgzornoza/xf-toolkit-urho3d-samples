@@ -1,5 +1,5 @@
-# xf-urho3d-toolkit-rube
-xamarin forms urho3d toolkit for rube editor
+# xf-toolkit-urho3d-samples 
+xamarin forms samples for urho3d toolkit
 
 
 
