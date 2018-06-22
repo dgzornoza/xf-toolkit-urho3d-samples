@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text;
 using Urho;
 using Urho.Urho2D;
+using XamarinForms.Toolkit.Urho3D.Rube;
 
 namespace Urho3d.Rube.Samples
 {
@@ -54,8 +55,8 @@ namespace Urho3d.Rube.Samples
 
             // TEMP: load rube
             string filePath = ResourceCache.GetResourceFileName("Urho2D/RubePhysics/documentA.json");
-            Toolkit.Urho.Rube.B2dJson b2dJson = new Toolkit.Urho.Rube.B2dJson();
-            b2dJson.ReadIntoNodeFromFile(filePath, this._scene.CreateChild("physicsNode"), out string errorMsg);
+            B2dJson b2dJson = new B2dJson();
+            b2dJson.ReadIntoNodeFromFile(filePath, this._scene.CreateChild("physicsNode"), true, out string errorMsg);
         }
 
 
