@@ -49,12 +49,12 @@ namespace Toolkit.Urho.Rube
             return new Dictionary<string, T>();
         }
 
-        public Dictionary<string, int> m_customPropertyMap_int { get; set; }
-        public Dictionary<string, float> m_customPropertyMap_float { get; set; }
-        public Dictionary<string, string> m_customPropertyMap_string { get; set; }
-        public Dictionary<string, Vector2> m_customPropertyMap_b2Vec2 { get; set; }
-        public Dictionary<string, bool> m_customPropertyMap_bool { get; set; }
-        public Dictionary<string, B2dJsonColor4> m_customPropertyMap_color { get; set; }
+        public Dictionary<string, int> m_customPropertyMap_int { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, float> m_customPropertyMap_float { get; set; } = new Dictionary<string, float>();
+        public Dictionary<string, string> m_customPropertyMap_string { get; set; } = new Dictionary<string, string>();
+        public Dictionary<string, Vector2> m_customPropertyMap_b2Vec2 { get; set; } = new Dictionary<string, Vector2>();
+        public Dictionary<string, bool> m_customPropertyMap_bool { get; set; } = new Dictionary<string, bool>();
+        public Dictionary<string, B2dJsonColor4> m_customPropertyMap_color { get; set; } = new Dictionary<string, B2dJsonColor4>();
     };
 
     public class B2dJson
@@ -783,7 +783,7 @@ namespace Toolkit.Urho.Rube
                 for (int i = 0; i < numBodyValues; i++)
                 {
                     JObject bodyValue = (JObject)bodyValues[i];
-                    RigidBody2D body = J2b2Body(urhoNode.CreateChild(mode: m_creationMode), bodyValue);
+                    RigidBody2D body = J2b2Body(urhoNode.CreateChild(name: bodyValue["name"]?.ToString() ?? "", mode: m_creationMode), bodyValue);
                     ReadCustomPropertiesFromJson(body, bodyValue);
                     m_bodies.Add(body);
                     m_indexToBodyMap.Add(i, body);
